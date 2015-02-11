@@ -659,7 +659,7 @@ init_channel(int channel, int subcycle_time_us)
 
     // Setup Data
     channels[channel].subcycle_time_us = subcycle_time_us;
-    channels[channel].num_samples = channels[channel].subcycle_time_us / (pulse_width_incr_us * 10);
+    channels[channel].num_samples = channels[channel].subcycle_time_us / pulse_width_incr_us * 10;
     channels[channel].width_max = channels[channel].num_samples - 1;
     channels[channel].num_cbs = channels[channel].num_samples * 2;
     channels[channel].num_pages = ((channels[channel].num_cbs * 32 + channels[channel].num_samples * 4 + \
