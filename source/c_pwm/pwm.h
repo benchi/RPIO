@@ -51,7 +51,7 @@ int get_channel_subcycle_time_us(int channel);
 #define SUBCYCLE_TIME_US_DEFAULT 20000
 
 // Subcycle minimum. We kept seeing no signals and strange behavior of the RPi
-#define SUBCYCLE_TIME_US_MIN 3000
+#define SUBCYCLE_TIME_US_MIN 99
 
 // Default pulse-width-increment-granularity
 #define PULSE_WIDTH_INCREMENT_GRANULARITY_US_DEFAULT 10
