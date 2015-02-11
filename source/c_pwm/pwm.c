@@ -51,13 +51,13 @@
  * PULSE WIDTH INCREMENT GRANULARITY
  * ---------------------------------
  * Another very important setting is the pulse width increment granularity, which
- * defaults to 10µs and is used for _all_ DMA channels (since its passed to the PWM
+ * defaults to 10ï¿½s and is used for _all_ DMA channels (since its passed to the PWM
  * timing hardware). Under the hood you need to set the pulse widths as multiples
- * of the increment-granularity. Eg. in order to set 500µs pulses with a granularity
- * setting of 10µs, you'll need to set the pulse-width as 50 (50 * 10µs = 500µs).
+ * of the increment-granularity. Eg. in order to set 500ï¿½s pulses with a granularity
+ * setting of 10ï¿½s, you'll need to set the pulse-width as 50 (50 * 10ï¿½s = 500ï¿½s).
  * Less granularity needs more DMA memory.
  *
- * To achieve shorter pulses than 10µs, you simply need set a lower granularity.
+ * To achieve shorter pulses than 10ï¿½s, you simply need set a lower granularity.
  *
  *
  * WARNING
@@ -610,7 +610,7 @@ init_hardware(void)
         udelay(100);
         clk_reg[PWMCLK_CNTL] = 0x5A000016;        // Source=PLLD and enable
         udelay(100);
-        pwm_reg[PWM_RNG1] = pulse_width_incr_us * 10;
+        pwm_reg[PWM_RNG1] = pulse_width_incr_us;
         udelay(10);
         pwm_reg[PWM_DMAC] = PWMDMAC_ENAB | PWMDMAC_THRSHLD;
         udelay(10);
@@ -630,7 +630,7 @@ init_hardware(void)
         udelay(100);
         pcm_reg[PCM_TXC_A] = 0<<31 | 1<<30 | 0<<20 | 0<<16; // 1 channel, 8 bits
         udelay(100);
-        pcm_reg[PCM_MODE_A] = (pulse_width_incr_us * 10 - 1) << 10;
+        pcm_reg[PCM_MODE_A] = (pulse_width_incr_us - 1) << 10;
         udelay(100);
         pcm_reg[PCM_CS_A] |= 1<<4 | 1<<3;        // Clear FIFOs
         udelay(100);
@@ -659,7 +659,7 @@ init_channel(int channel, int subcycle_time_us)
 
     // Setup Data
     channels[channel].subcycle_time_us = subcycle_time_us;
-    channels[channel].num_samples = channels[channel].subcycle_time_us / pulse_width_incr_us;
+    channels[channel].num_samples = channels[channel].subcycle_time_us / (pulse_width_incr_us * 10);
     channels[channel].width_max = channels[channel].num_samples - 1;
     channels[channel].num_cbs = channels[channel].num_samples * 2;
     channels[channel].num_pages = ((channels[channel].num_cbs * 32 + channels[channel].num_samples * 4 + \
@@ -682,7 +682,7 @@ print_channel(int channel)
     if (channel > DMA_CHANNELS - 1)
         return fatal("Error: you tried to print channel %d, but max channel is %d\n", channel, DMA_CHANNELS-1);
     log_debug("Subcycle time: %dus\n", channels[channel].subcycle_time_us);
-    log_debug("PW Increments: %dus\n", pulse_width_incr_us);
+    log_debug("PW Increments Tenth of micros: %dus\n", pulse_width_incr_us);
     log_debug("Num samples:   %d\n", channels[channel].num_samples);
     log_debug("Num CBS:       %d\n", channels[channel].num_cbs);
     log_debug("Num pages:     %d\n", channels[channel].num_pages);
@@ -714,7 +714,7 @@ setup(int pw_incr_us, int hw)
         return fatal("Error: setup(..) has already been called before\n");
 
     log_debug("Using hardware: %s\n", delay_hw == DELAY_VIA_PWM ? "PWM" : "PCM");
-    log_debug("PW increments:  %dus\n", pulse_width_incr_us);
+    log_debug("PW increments tent of micros:  %dus\n", pulse_width_incr_us);
 
     // Catch all kind of kill signals
     setup_sighandlers();
